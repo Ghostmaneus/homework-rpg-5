@@ -6,6 +6,15 @@ import com.narxoz.rpg.hero.HeroProfile;
 
 import java.util.Random;
 
+/**
+ * Battle rules (design decisions):
+ * - Hero always attacks first each round.
+ * - Hero damage = action.getDamage() + random bonus [0..4].
+ * - Boss damage = boss.getAttackPower() + random bonus [0..3].
+ * - Maximum 20 rounds; whoever reaches 0 HP first loses.
+ * - If round limit is reached, the side with more HP wins.
+ * - Determinism is controlled via setRandomSeed().
+ */
 public class BattleService {
     private Random random = new Random(1L);
 
@@ -15,21 +24,46 @@ public class BattleService {
     }
 
     public AdventureResult battle(HeroProfile hero, BossEnemy boss, AttackAction action) {
-        // TODO: Implement the battle flow.
-        // Questions to answer:
-        // - Who attacks first?
-        // - How many rounds are allowed?
-        // - How is damage resolved?
-        // - How will randomness affect the result, if at all?
         AdventureResult result = new AdventureResult();
-        result.setWinner("TODO");
-        result.setRounds(0);
-        result.setReward("TODO");
-        result.addLine("TODO: implement battle logic");
+        result.addLine("[Battle] " + hero.getName() + " vs " + boss.getName() + " — FIGHT!");
 
-        // Keep the field in use so students can decide whether to rely on it.
-        if (random.nextInt(1) == 0) {
-            // TODO: Replace placeholder branch with real deterministic or random logic.
+        int round = 0;
+        final int maxRounds = 20;
+
+        while (hero.isAlive() && boss.isAlive() && round < maxRounds) {
+            round++;
+
+            // Hero's turn
+            int heroDmg = action.getDamage() + random.nextInt(5);
+            boss.takeDamage(heroDmg);
+            result.addLine("  Round " + round + ": "
+                    + hero.getName() + " uses [" + action.getActionName() + "] → "
+                    + heroDmg + " dmg → " + boss.getName() + " HP=" + boss.getHealth());
+
+            if (!boss.isAlive()) break;
+
+            // Boss's turn
+            int bossDmg = boss.getAttackPower() + random.nextInt(4);
+            hero.takeDamage(bossDmg);
+            result.addLine("  Round " + round + ": "
+                    + boss.getName() + " strikes back → "
+                    + bossDmg + " dmg → " + hero.getName() + " HP=" + hero.getHealth());
+        }
+
+        result.setRounds(round);
+
+        if (!boss.isAlive()) {
+            result.setWinner(hero.getName());
+            result.addLine("[Battle] " + hero.getName() + " wins in " + round + " rounds!");
+        } else if (!hero.isAlive()) {
+            result.setWinner(boss.getName());
+            result.addLine("[Battle] " + boss.getName() + " wins in " + round + " rounds!");
+        } else if (hero.getHealth() >= boss.getHealth()) {
+            result.setWinner(hero.getName());
+            result.addLine("[Battle] Round limit reached. " + hero.getName() + " wins on HP.");
+        } else {
+            result.setWinner(boss.getName());
+            result.addLine("[Battle] Round limit reached. " + boss.getName() + " wins on HP.");
         }
 
         return result;

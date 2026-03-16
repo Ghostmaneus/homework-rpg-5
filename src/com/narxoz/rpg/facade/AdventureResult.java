@@ -37,6 +37,9 @@ public class AdventureResult {
     public void addLine(String line) {
         log.add(line);
     }
+    public void addLineFirst(String line) {
+        log.add(0, line);
+    }
 
     public List<String> getLog() {
         return Collections.unmodifiableList(log);

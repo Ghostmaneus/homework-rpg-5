@@ -1,0 +1,58 @@
+@startuml Decorator Pattern
+
+skinparam classAttributeIconSize 0
+
+interface AttackAction {
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+class BasicAttack {
+    - actionName: String
+    - baseDamage: int
+    + BasicAttack(actionName, baseDamage)
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+abstract class ActionDecorator {
+    - wrappedAction: AttackAction
+    # ActionDecorator(wrappedAction: AttackAction)
+    # getWrappedAction(): AttackAction
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+class FireRuneDecorator {
+    + FireRuneDecorator(wrappedAction: AttackAction)
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+class PoisonCoatingDecorator {
+    + PoisonCoatingDecorator(wrappedAction: AttackAction)
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+class CriticalFocusDecorator {
+    + CriticalFocusDecorator(wrappedAction: AttackAction)
+    + getActionName(): String
+    + getDamage(): int
+    + getEffectSummary(): String
+}
+
+BasicAttack ..|> AttackAction
+ActionDecorator ..|> AttackAction
+ActionDecorator o--> AttackAction : wrappedAction
+
+FireRuneDecorator --|> ActionDecorator
+PoisonCoatingDecorator --|> ActionDecorator
+CriticalFocusDecorator --|> ActionDecorator
+
+@enduml

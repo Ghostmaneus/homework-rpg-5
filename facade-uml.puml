@@ -1,0 +1,81 @@
+@startuml Facade Pattern
+
+skinparam classAttributeIconSize 0
+
+class DungeonFacade {
+    - preparationService: PreparationService
+    - battleService: BattleService
+    - rewardService: RewardService
+    + setRandomSeed(seed: long): DungeonFacade
+    + runAdventure(hero, boss, action): AdventureResult
+}
+
+class PreparationService {
+    + prepare(hero, boss, action): String
+}
+
+class BattleService {
+    - random: Random
+    + setRandomSeed(seed: long): BattleService
+    + battle(hero, boss, action): AdventureResult
+}
+
+class RewardService {
+    + determineReward(battleResult): String
+}
+
+class AdventureResult {
+    - winner: String
+    - rounds: int
+    - reward: String
+    - log: List<String>
+    + getWinner(): String
+    + setWinner(winner): void
+    + getRounds(): int
+    + setRounds(rounds): void
+    + getReward(): String
+    + setReward(reward): void
+    + addLine(line): void
+    + addLineFirst(line): void
+    + getLog(): List<String>
+}
+
+class HeroProfile {
+    - name: String
+    - health: int
+    + getName(): String
+    + getHealth(): int
+    + takeDamage(amount): void
+    + isAlive(): boolean
+}
+
+class BossEnemy {
+    - name: String
+    - health: int
+    - attackPower: int
+    + getName(): String
+    + getHealth(): int
+    + getAttackPower(): int
+    + takeDamage(amount): void
+    + isAlive(): boolean
+}
+
+class Main {
+    + {static} main(args): void
+    - {static} printAction(label, action): void
+}
+
+DungeonFacade --> PreparationService : uses
+DungeonFacade --> BattleService : uses
+DungeonFacade --> RewardService : uses
+BattleService --> AdventureResult : creates
+Main --> DungeonFacade : depends on
+
+Main ..> HeroProfile : creates
+Main ..> BossEnemy : creates
+BattleService ..> HeroProfile : uses
+BattleService ..> BossEnemy : uses
+PreparationService ..> HeroProfile : uses
+PreparationService ..> BossEnemy : uses
+
+@enduml
